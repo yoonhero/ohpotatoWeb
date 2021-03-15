@@ -1,6 +1,8 @@
 import Avatar from "./Avatar";
 import { gql, useMutation } from "@apollo/client";
 import styled from "styled-components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 const READ_MESSAGE_MUTATION = gql`
   mutation readMessage($id: Int!) {
@@ -107,22 +109,34 @@ const Me = styled(Bubble)`
     right: -3px;
     background-color: #eceff1;
   }
+  div {
+    position: absolute;
+    left: -5px;
+
+    top: -5px;
+    color: #67809f;
+  }
 `;
 const SeeMessage = ({ message }) => {
-  const { data } = useMutation(READ_MESSAGE_MUTATION, {
-    variables: {
-      id: message.id,
-    },
-  });
-  console.log(data);
+  const [readMessage] = useMutation(READ_MESSAGE_MUTATION);
 
   if (message?.user?.isMe) {
     return (
       <Me key={message.id}>
         <span>{message?.payload}</span>
+        {message?.read ? null : (
+          <div>
+            <FontAwesomeIcon icon={faPaperPlane} />
+          </div>
+        )}
       </Me>
     );
   } else {
+    readMessage({
+      variables: {
+        id: message.id,
+      },
+    });
     return (
       <You>
         {message?.user?.avatar ? (

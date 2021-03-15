@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 import { useParams } from "react-router";
 import { LoadingSpinner } from "./LoadingSpinner";
 import styled from "styled-components";
@@ -6,6 +6,9 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import SeeMessage from "./SeeMessage";
+import { useForm } from "react-hook-form";
+import PageTitle from "./PageTitle";
+import useUser from "../hooks/useUser";
 
 export const SEE_ROOM = gql`
   query seeRoom($id: Int!) {
@@ -35,73 +38,27 @@ export const SEE_ROOM = gql`
   }
 `;
 
+const ROOM_UPDATE_SUBSCRIPTION = gql`
+  subscription($id: Int!) {
+    roomUpdates(id: $id) {
+      id
+      payload
+      user {
+        avatar
+        username
+      }
+    }
+  }
+`;
+
 const SEND_MESSAGE_MUTATION = gql`
   mutation sendMessage($payload: String!, $roomId: Int, $userId: Int) {
     sendMessage(payload: $payload, roomId: $roomId, userId: $userId) {
       ok
       error
+      id
     }
   }
-`;
-
-const OtherMessage = styled.div`
-  position: relative;
-  background-color: #2ecc71;
-  max-width: 30%;
-  min-width: 10%;
-  color: white;
-  margin-top: 1rem;
-  border-radius: 15px;
-  padding: 20px 20px 20px;
-  &:after {
-    border-top: 0px solid transparent;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #2ecc71;
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: 30px;
-  }
-`;
-
-const MyMessage = styled.div`
-  position: relative;
-  background-color: #2ecc71;
-  max-width: 30%;
-  min-width: 10%;
-  color: white;
-  margin-top: 1rem;
-  border-radius: 15px;
-  padding: 20px 20px 20px;
-  &:after {
-    border-top: 0px solid transparent;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #2ecc71;
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: 30px;
-  }
-`;
-const Username = styled.span`
-  margin-left: 1rem;
-  font-size: 17px;
-  font-weight: 600px;
-`;
-
-const UserContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-`;
-const Container = styled.div`
-  top: 50%;
-  left: 50%;
-  width: 80%;
-  height: 75%;
-  background-color: #ffffff;
-  transform: translate(-50%, -50%);
 `;
 
 const Input = styled.input`
@@ -126,7 +83,7 @@ const Chat = styled.div`
   flex-direction: column;
 `;
 
-const InputContainer = styled.div`
+const InputContainer = styled.form`
   background-color: #a0cbe7;
   margin: 0;
   justify-content: center;
@@ -150,23 +107,108 @@ const InputContainer = styled.div`
 
 const Room = () => {
   const { id } = useParams();
+  const { register, handleSubmit, getValues, setValue } = useForm({
+    mode: "onChange",
+  });
   const { data, loading } = useQuery(SEE_ROOM, {
     variables: { id: Math.floor(id) },
   });
-  console.log(data);
+  const { data: userData } = useUser();
+  const [sendMessage, { loading: sendMessageLoading }] = useMutation(
+    SEND_MESSAGE_MUTATION
+  );
+
+  const {
+    data: roomUpdateData,
+    loading: roomUpdateLoading,
+    error,
+  } = useSubscription(ROOM_UPDATE_SUBSCRIPTION, {
+    variables: {
+      id: Math.floor(id),
+    },
+  });
+  if (roomUpdateLoading) return <p>Loading...</p>;
+  if (error) return <p>Error :(</p>;
+
+  console.log(roomUpdateData);
+
+  const createMessage = (cache, result) => {
+    const { payload } = getValues();
+    setValue("payload", "");
+    const {
+      data: {
+        sendMessage: { ok, id: messageId },
+      },
+    } = result;
+    if (ok && userData?.me) {
+      const newMessage = {
+        __typename: "Message",
+        createdAt: String(Date.now()),
+        id: messageId,
+        payload,
+        read: false,
+      };
+
+      const newCacheComment = cache.writeFragment({
+        data: newMessage,
+        fragment: gql`
+          fragment BSName on Message {
+            id
+            createdAt
+            read
+            payload
+          }
+        `,
+      });
+      cache.modify({
+        id: `Room:${id}`,
+        fields: {
+          messages(prev) {
+            return [...prev, newCacheComment];
+          },
+        },
+      });
+    }
+  };
+
+  const onSubmitValid = (data) => {
+    if (sendMessageLoading || loading) {
+      return;
+    }
+    sendMessage({
+      variables: {
+        ...data,
+        roomId: Math.floor(id),
+      },
+
+      update: createMessage,
+    });
+  };
+  const orderedData = data?.seeRoom?.messages?.slice().sort(function (a, b) {
+    return a["id"] - b["id"];
+  });
+
   return (
     <>
+      <PageTitle title={`Talked with ${id}`} />
       {loading ? (
         <LoadingSpinner />
       ) : (
         <>
           <Chat>
-            {data?.seeRoom?.messages?.map((message) => (
+            {orderedData?.map((message) => (
               <SeeMessage message={message} />
             ))}
           </Chat>
-          <InputContainer>
-            <Input type='text' placeholder='type a message' />
+          <InputContainer onSubmit={handleSubmit(onSubmitValid)}>
+            <Input
+              ref={register({
+                required: "Please type message",
+              })}
+              name='payload'
+              type='text'
+              placeholder='type a message'
+            />
             <button type='submit'>
               <FontAwesomeIcon icon={faPaperPlane} />
             </button>
