@@ -9,6 +9,7 @@ import SeeMessage from "./SeeMessage";
 import { useForm } from "react-hook-form";
 import PageTitle from "./PageTitle";
 import useUser from "../hooks/useUser";
+import { useRef } from "react";
 
 export const SEE_ROOM = gql`
   query seeRoom($id: Int!) {
@@ -39,7 +40,7 @@ export const SEE_ROOM = gql`
 `;
 
 const ROOM_UPDATE_SUBSCRIPTION = gql`
-  subscription($id: Int!) {
+  subscription roomUpdates($id: Int!) {
     roomUpdates(id: $id) {
       id
       payload
@@ -106,6 +107,7 @@ const InputContainer = styled.form`
 `;
 
 const Room = () => {
+  const scrollRef = useRef();
   const { id } = useParams();
   const { register, handleSubmit, getValues, setValue } = useForm({
     mode: "onChange",
@@ -127,10 +129,6 @@ const Room = () => {
       id: Math.floor(id),
     },
   });
-  if (roomUpdateLoading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
-
-  console.log(roomUpdateData);
 
   const createMessage = (cache, result) => {
     const { payload } = getValues();
@@ -187,7 +185,6 @@ const Room = () => {
   const orderedData = data?.seeRoom?.messages?.slice().sort(function (a, b) {
     return a["id"] - b["id"];
   });
-
   return (
     <>
       <PageTitle title={`Talked with ${id}`} />
