@@ -3,7 +3,7 @@ import styled from "styled-components";
 const Input = styled.input`
   width: 100%;
   padding: 7px;
-  border-radius: 3px;
+  border-radius: 5px;
   background-color: ${(props) => props.theme.inputBgColor};
   border: 0.5px solid
     ${(props) => (props.hasError ? "tomato" : props.theme.borderColor)};
@@ -16,6 +16,7 @@ const Input = styled.input`
   &:focus {
     border-color: rgb(38, 38, 38);
   }
+  
 `;
 
 export default Input;

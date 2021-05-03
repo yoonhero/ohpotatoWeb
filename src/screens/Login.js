@@ -86,49 +86,50 @@ const Login = () => {
       <PageTitle title='LogIn' />
       <FormBox>
         <div>
-          <FontAwesomeIcon icon={faPaperPlane} size='3x' />
+          {/* <img src="./logo.png" alt="" /> */ }
+          <h1>ATC</h1>
         </div>
-        <Notification>{location?.state?.message}</Notification>
+        <Notification>{ location?.state?.message }</Notification>
 
-        <form onSubmit={handleSubmit(onSubmitValid)}>
+        <form onSubmit={ handleSubmit(onSubmitValid) }>
           <Input
-            ref={register({
+            ref={ register({
               required: "Username is required.",
               minLength: {
                 value: 5,
                 message: "Username should be longer than 5 chars.",
               },
-            })}
-            onChange={clearLoginError}
+            }) }
+            onChange={ clearLoginError }
             name='username'
             type='text'
             placeholder='Username'
-            hasError={Boolean(errors?.username?.message)}
+            hasError={ Boolean(errors?.username?.message) }
           />
-          <FormError message={errors?.username?.message} />
+          <FormError message={ errors?.username?.message } />
           <Input
-            ref={register({
+            ref={ register({
               required: "Password is required.",
-            })}
-            onChange={clearLoginError}
+            }) }
+            onChange={ clearLoginError }
             name='password'
             type='password'
             placeholder='Password'
-            hasError={Boolean(errors?.password?.message)}
+            hasError={ Boolean(errors?.password?.message) }
           />
-          <FormError message={errors?.password?.message} />
+          <FormError message={ errors?.password?.message } />
           <Button
             type='submit'
-            value={loading ? "Loading..." : "Log in"}
-            disabled={!formState.isValid || loading}
+            value={ loading ? "Loading..." : "Log in" }
+            disabled={ !formState.isValid || loading }
           />
-          <FormError message={errors?.result?.message} />
+          <FormError message={ errors?.result?.message } />
         </form>
       </FormBox>
       <BottomBox
-        cta={"Don't have an account?"}
+        cta={ "Don't have an account?" }
         linkText='Sign Up'
-        link={routes.signUp}
+        link={ routes.signUp }
       />
     </AuthLayout>
   );

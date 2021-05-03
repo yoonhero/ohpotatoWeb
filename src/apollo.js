@@ -3,11 +3,19 @@ import {
   createHttpLink,
   InMemoryCache,
   makeVar,
+  split,
 } from "@apollo/client";
+import { onError } from "@apollo/client/link/error";
 import { setContext } from "@apollo/client/link/context";
-import { WebSocketLink } from "apollo-link-ws";
+import { WebSocketLink } from "@apollo/client/link/ws";
 import { createUploadLink } from "apollo-upload-client";
 import { useHistory } from "react-router";
+import {
+  getMainDefinition,
+  offsetLimitPagination,
+} from "@apollo/client/utilities";
+
+
 const TOKEN = "token";
 const DARK_MODE = "DARK_MODE";
 
@@ -31,10 +39,26 @@ export const enableDarkMode = () => {
   darkModeVar(true);
 };
 
+
 export const disabledDarkMode = () => {
   localStorage.removeItem(DARK_MODE);
   darkModeVar(false);
 };
+
+
+const uploadHttpLink = createUploadLink({
+  uri: "http://localhost:7000/graphql",
+});
+
+const wsLink = new WebSocketLink({
+  uri: "ws://localhost:7000/graphql",
+  options: {
+    reconnect: true,
+    connectionParams: () => ({
+      token: localStorage.getItem(TOKEN),
+    }),
+  },
+});
 
 const httpLink = createUploadLink({
   uri: "http://localhost:7000/graphql",
@@ -49,13 +73,42 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-export const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache({
-    typePolicies: {
-      User: {
-        keyFields: (obj) => `User:${obj.username}`,
+const onErrorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    console.log("GraphQL Error", graphQLErrors);
+  } else if (networkError) {
+    console.log("Network Error", networkError);
+  }
+});
+
+export const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        seeFeed: offsetLimitPagination(),
       },
     },
-  }),
+    User: {
+      keyFields: (obj) => `User:${obj.username}`,
+    },
+  },
+});
+
+const httpLinks = authLink.concat(onErrorLink).concat(uploadHttpLink);
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  httpLinks
+);
+
+export const client = new ApolloClient({
+  link: splitLink,
+  cache,
 });

@@ -28,12 +28,12 @@ const AuthLayout = ({ children }) => {
   const darkMode = useReactiveVar(darkModeVar);
   return (
     <Container>
-      <Wrapper>{children}</Wrapper>
-      <Footer>
+      <Wrapper>{ children }</Wrapper>
+      {/* <Footer>
         <DarkModaBtn onClick={darkMode ? disabledDarkMode : enableDarkMode}>
           <FontAwesomeIcon icon={darkMode ? faSun : faMoon} />
         </DarkModaBtn>
-      </Footer>
+      </Footer> */}
     </Container>
   );
 };

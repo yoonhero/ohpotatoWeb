@@ -8,6 +8,8 @@ export const ME_QUERY = gql`
       id
       username
       avatar
+      firstName
+      lastName
     }
   }
 `;

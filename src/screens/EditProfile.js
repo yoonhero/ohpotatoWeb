@@ -10,6 +10,7 @@ import AuthLayout from "../components/auth/AuthLayout";
 
 import { useState } from "react";
 import { logUserOut } from "../apollo";
+import Avatar from "../components/Avatar";
 
 const ME_QUERY = gql`
   query me {
@@ -98,7 +99,7 @@ const EditAvatar = styled.div`
   margin-bottom: 30px;
   label div img {
     height: 100px;
-    width: 100px;
+    max-width: 100px;
     border-radius: 50%;
   }
   label span {
@@ -183,15 +184,15 @@ const EditProfile = () => {
     <>
       {!loading && data?.me?.isMe ? (
         <EditProfileContainer>
-          <Form onSubmit={handleSubmit(onSubmitValid)}>
+          <Form onSubmit={ handleSubmit(onSubmitValid) }>
             <Title>Edit Profile</Title>
             <FormBox>
               <EditAvatar>
                 <label for='attach-file'>
                   <div>
-                    {data?.me?.avatar ? (
+                    { data?.me?.avatar ? (
                       <img
-                        src={avatarUrl !== "" ? avatarUrl : data?.me?.avatar}
+                        src={ avatarUrl !== "" ? avatarUrl : data?.me?.avatar }
                         alt=''
                       />
                     ) : (
@@ -203,47 +204,47 @@ const EditProfile = () => {
                         }
                         alt=''
                       />
-                    )}
+                    ) }
                   </div>
                   <span>upload</span>
                 </label>
                 <FileInput
-                  ref={register({})}
+                  ref={ register({}) }
                   name='avatar'
                   id='attach-file'
                   type='file'
                   accept='image/*'
-                  onChange={editAvatar}
+                  onChange={ editAvatar }
                 />
               </EditAvatar>
               <div>
                 <Label for='username'>username : </Label>
                 <InputBox
-                  ref={register({})}
+                  ref={ register({}) }
                   type='text'
                   name='username'
                   placeholder='Username'
-                  defaultValue={data?.me?.username ? data?.me?.username : ""}
+                  defaultValue={ data?.me?.username ? data?.me?.username : "" }
                 />
               </div>
               <div>
                 <Label for='firstName'>firstName : </Label>
                 <InputBox
-                  ref={register({})}
+                  ref={ register({}) }
                   type='text'
                   name='firstName'
                   placeholder='firstName'
-                  defaultValue={data?.me?.firstName ? data?.me?.firstName : ""}
+                  defaultValue={ data?.me?.firstName ? data?.me?.firstName : "" }
                 />
               </div>
               <div>
                 <Label for='lastName'>lastName : </Label>
                 <InputBox
-                  ref={register({})}
+                  ref={ register({}) }
                   type='text'
                   name='lastName'
                   placeholder='lastName'
-                  defaultValue={data?.me?.lastName ? data?.me?.lastName : ""}
+                  defaultValue={ data?.me?.lastName ? data?.me?.lastName : "" }
                 />
               </div>
             </FormBox>
@@ -251,35 +252,35 @@ const EditProfile = () => {
               <div>
                 <Label for='username'>email : </Label>
                 <InputBox
-                  ref={register({})}
+                  ref={ register({}) }
                   type='text'
                   name='email'
                   placeholder='email'
-                  defaultValue={data?.me?.email ? data?.me?.email : ""}
+                  defaultValue={ data?.me?.email ? data?.me?.email : "" }
                 />
               </div>
               <div>
                 <Label for='bio'>bio : </Label>
                 <InputBox
-                  ref={register({})}
+                  ref={ register({}) }
                   type='text'
                   name='bio'
                   placeholder='bio'
-                  defaultValue={data?.me?.bio ? data?.me?.bio : ""}
+                  defaultValue={ data?.me?.bio ? data?.me?.bio : "" }
                 />
               </div>
             </FormBox>
 
             <SubmitButton
               type='submit'
-              value={loading ? "Loading..." : "Submit"}
+              value={ loading ? "Loading..." : "Submit" }
             />
-            <LogOuButton type='submit' value='SignOut' onClick={logUserOut} />
+            <LogOuButton type='submit' value='SignOut' onClick={ logUserOut } />
           </Form>
         </EditProfileContainer>
       ) : (
         ""
-      )}{" "}
+      ) }{ " " }
     </>
   );
 };

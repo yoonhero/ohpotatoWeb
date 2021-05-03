@@ -98,76 +98,77 @@ const SignUp = () => {
       <PageTitle title='Sign Up' />
       <FormBox>
         <HeaderContainer>
-          <FontAwesomeIcon icon={faPaperPlane} size='3x' />
+          {/* <FontAwesomeIcon icon={faPaperPlane} size='3x' /> */ }
+          <h1>ATC</h1>
         </HeaderContainer>
-        <form onSubmit={handleSubmit(onSubmitValid)}>
+        <form onSubmit={ handleSubmit(onSubmitValid) }>
           <Input
-            ref={register({
+            ref={ register({
               required: "First Name is required.",
-            })}
-            onChange={clearLoginError}
+            }) }
+            onChange={ clearLoginError }
             name='firstName'
             type='text'
             placeholder='First Name'
-            hasError={Boolean(errors?.firstName?.message)}
+            hasError={ Boolean(errors?.firstName?.message) }
           />
-          <FormError message={errors?.firstName?.message} />
+          <FormError message={ errors?.firstName?.message } />
           <Input
-            ref={register()}
-            onChange={clearLoginError}
+            ref={ register() }
+            onChange={ clearLoginError }
             name='lastName'
             type='text'
             placeholder='Last Name'
           />
           <Input
-            ref={register({
+            ref={ register({
               required: "Email is required.",
-            })}
-            onChange={clearLoginError}
+            }) }
+            onChange={ clearLoginError }
             name='email'
             type='text'
             placeholder='Email'
-            hasError={Boolean(errors?.email?.message)}
+            hasError={ Boolean(errors?.email?.message) }
           />
-          <FormError message={errors?.email?.message} />
+          <FormError message={ errors?.email?.message } />
           <Input
-            ref={register({
+            ref={ register({
               required: "Username is required",
               minLength: {
                 value: 5,
                 message: "Username should be longer than 5 chars.",
               },
-            })}
-            onChange={clearLoginError}
+            }) }
+            onChange={ clearLoginError }
             name='username'
             type='text'
             placeholder='Username'
-            hasError={Boolean(errors?.username?.message)}
+            hasError={ Boolean(errors?.username?.message) }
           />
-          <FormError message={errors?.username?.message} />
+          <FormError message={ errors?.username?.message } />
           <Input
-            ref={register({
+            ref={ register({
               required: "Password is required",
-            })}
-            onChange={clearLoginError}
+            }) }
+            onChange={ clearLoginError }
             name='password'
             type='password'
             placeholder='Password'
-            hasError={Boolean(errors?.password?.message)}
+            hasError={ Boolean(errors?.password?.message) }
           />
-          <FormError message={errors?.password?.message} />
+          <FormError message={ errors?.password?.message } />
           <Button
             type='submit'
-            value={loading ? "Loading..." : "Sign Up"}
-            disabled={!formState.isValid || loading}
+            value={ loading ? "Loading..." : "Sign Up" }
+            disabled={ !formState.isValid || loading }
           />
-          <FormError message={errors?.result?.message} />
+          <FormError message={ errors?.result?.message } />
         </form>
       </FormBox>
       <BottomBox
-        cta={"Have an account?"}
+        cta={ "Have an account?" }
         linkText='Log In'
-        link={routes.home}
+        link={ routes.home }
       />
     </AuthLayout>
   );

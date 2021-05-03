@@ -1,6 +1,7 @@
 import { useReactiveVar } from "@apollo/client";
 import { faInstagram } from "@fortawesome/free-brands-svg-icons";
 import {
+  faAngleLeft,
   faCompass,
   faHome,
   faPaperPlane,
@@ -18,6 +19,9 @@ import Input from "./auth/Input";
 import Avatar from "./Avatar";
 
 const SHeader = styled.header`
+top: 0;
+left:0;
+position: fixed;
   width: 100%;
   border-bottom: 1px solid ${(props) => props.theme.borderColor};
   background-color: ${(props) => props.theme.bgColor};
@@ -25,6 +29,8 @@ const SHeader = styled.header`
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #f5f5f5;
+  z-index: 10;
   svg {
     color: #6c7a89;
   }
@@ -41,6 +47,12 @@ const Wrapper = styled.div`
 const Column = styled.div`
   margin-left: 15px;
   margin-right: 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  p{
+    margin-left: 10px;
+  }
 `;
 
 const Icon = styled.span`
@@ -61,65 +73,23 @@ const IconsContainer = styled.div`
   align-items: center;
 `;
 
-const SearchInput = styled(Input)`
-  width: 100%;
-`;
 
-const SearchButton = styled(Button)`
-  position: absolute;
-  background: inherit;
-  top: 20px;
-  svg {
-    color: rgb(38, 38, 38);
-  }
-`;
-
-const FileInput = styled.input`
-  display: none;
-`;
-
-const TitleLogo = styled.h1`
-  font-size: 24px;
-  font-weight: 400;
-`
-
-export const Header = () => {
+export const RoomHeader = ({ url, username }) => {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
   const { data } = useUser();
   const history = useHistory();
-
-  const { register, handleSubmit, getValues, setValue } = useForm({
-    mode: "onChange",
-  });
-
-  const onSubmitValid = async () => {
-    const { search } = getValues();
-    setValue("");
-    history.push(`/search/${search}`);
-  };
 
   return (
     <SHeader>
       <Wrapper>
         <Column>
           <Link to={ routes.home }>
-            {/* <FontAwesomeIcon icon={faPaperPlane} size='2x' /> */ }
-            <TitleLogo>ATC</TitleLogo>
+            <FontAwesomeIcon icon={ faAngleLeft } size='2x' />
           </Link>
         </Column>
         <Column>
-          <form onSubmit={ handleSubmit(onSubmitValid) }>
-            <SearchInput
-              ref={ register({}) }
-              type='text'
-              name='search'
-              placeholder='검색...'
-            />
-
-            <SearchButton type='submit'>
-              <FontAwesomeIcon icon={ faSearch } />
-            </SearchButton>
-          </form>
+          <Avatar url />
+          <p>{ username }</p>
         </Column>
         <Column>
           { isLoggedIn ? (
@@ -144,3 +114,5 @@ export const Header = () => {
     </SHeader>
   );
 };
+
+

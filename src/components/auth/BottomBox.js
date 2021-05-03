@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 const SBottomBox = styled(BaseBox)`
   padding: 20px 0px;
   text-align: center;
+  border-radius: 10px;
   a {
     font-weight: 600;
     margin-left: 5px;
@@ -16,9 +17,9 @@ const SBottomBox = styled(BaseBox)`
 const BottomBox = ({ cta, link, linkText }) => {
   return (
     <SBottomBox>
-      <span>{cta}</span>
+      <span>{ cta }</span>
 
-      <Link to={link}>{linkText}</Link>
+      <Link to={ link }>{ linkText }</Link>
     </SBottomBox>
   );
 };

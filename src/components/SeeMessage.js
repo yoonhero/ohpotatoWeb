@@ -117,38 +117,60 @@ const Me = styled(Bubble)`
     color: #67809f;
   }
 `;
-const SeeMessage = ({ message }) => {
-  const [readMessage] = useMutation(READ_MESSAGE_MUTATION);
-
-  if (message?.user?.isMe) {
-    return (
-      <Me key={message.id}>
-        <span>{message?.payload}</span>
-        {message?.read ? null : (
-          <div>
-            <FontAwesomeIcon icon={faPaperPlane} />
-          </div>
-        )}
-      </Me>
-    );
-  } else {
-    readMessage({
-      variables: {
-        id: message.id,
-      },
-    });
-    return (
-      <You>
-        {message?.user?.avatar ? (
-          <YouAvatar url={message?.user?.avatar} />
-        ) : (
-          <YouAvatar url='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAMFBMVEXd3N3////a2dr7+/v29vbf3t/s7Ozx8fHe3d75+fnj4uPn5+fq6urv7+/l5OX39vdM82/MAAAE+ElEQVR4nO2di5qqMAyEsSAqKr7/2x4rywKuKJCkM/XkfwLnS5lcerEoHMdxHMdxHMdxHMdxHMdxHMdxHMdxHMdxHMcBER6gf4UFd1VNe67rqrrdqsPl0rbHbxIa9udDWe6mlGVVN9+hsrk+ixtxOB8zF9kc3sjrqNpsRYairT7J66j3WWoM9TJ5XSCb7DSGdoW+yKHISmNoTysF3qnRv3oF++t6fXdObSZhDO1H/5zjmofENQ7zJ4x79K//zPEmEHjnzB7GsMFippB/jI1U350Ds8SzgsCYGmlZm+XnqFijuFcSyLtQ1QTudhdGiUexi445o+X8JSzslJbSoAU9Ey66AnclWtEzGolwCpmh7jcX2/Nc0KLGrOrnF4NWNUZ/jUaI1qm2j/bwtFJa1dozFVrYL0YCeczGxGYesCRFg0zRw1G82RhpB0eTYWSkHQx2erQUSDFf3Db9XQxa3j3bG/pMpEULNPWZCN5r7JJhR4lWKJ8AfwK9TG2dNILedNOZAb/jBl6mxrniTnmECrTqDMeAyxpzo0Fbjd4gf57r1yvE5nyr+cUY7EDKPlnsdiekwEJ7lk+nMBwSKIQ2UK7QFbpCvELz/jeCHQunyIfYjP/9Nc3316XWkza8wu/vD4PwNOkSsD1+ioQInmLYpwts85TCTLFDDPuNGYJtYPO6DS3QPCMSHBsyXqbwRWqeL9D6Cms3xW+QFsbLFL17+MAy6Z8YQvgfnImy9BqGA0OFpdcwnBeK2JyB3sG3f0dYFacURtphY6fwozQjbFp9qmszFvU3RTnzS9BfpyTJ/hf9pEi1RiPafspRzUzQ/RRZcv0EzdKGy2V6FK8goieIc+hVb5QRjASdk4olSUfxCpWFyrpEO4LcUdEz7o9IJXK66ISj6FAt+csmP2z3mxwe4IlsfkaJ/hMc2JQZT1m9SxdWL9VsHvr6ITRro3jN6dW9EOotflrVmTz2GZrt6SKH5xMl+nLQKNXHrjHsde4IVbRpQ28YRfmeWag1R1FlzRbG0GhPvW9kn6PFNUSiKjXsbc5g8hSqdhv5HGNhpfHTaxgGwxavfI2Az91CY302scR6qsGm2l+Q7+6aHVGYgsv+6m8lzoF669PURKdgLDXFYwO/IM7RJhWIkJjIZAZS200ykxlIazfJIxhJGUWIwKQSU9zJe0WyIzbGxfY8qcrwANIXSbJO09xQnyHFDjHIZXoSuA3KZXrs3QYs0PyaUOJq9BXGFWqKFwY+YXu+Ha3ugaE+gjUaMVynKeZOSzAbFNvfal6I1UUMcK4fY5T3U7xjshSTEhxajz5jUp+iy7UpFsUbi810GDwexZIpetQzBk2m6FHPGGwhVA8iXQjVg8gXQu0gJnjwajWq9zKYypkBxcKGqpwZUCxsOEOoGURGn4moeQ1hquhQSxhcNfcYpfqbZDrzCq2JDVrHG3QEpt/QXo7OX8/xLlKl/w+0/ycZCRov2LAmww6FlEjspBEFN0XuaS9BrpB7kSosU9K2YkDcYNDWpD3i2pS1cRqQtlDsn6H4Q6T/DOUfIvtnKJ7v87aGA7ImkeHsxSdkZzN4tn3nEf0FJHlR2iErTfmNRmg1/Pk+Isn5ORiNzGqYRzQDkmFNuptNEgRXorOwUpGZ0rdOHYIGin2C0eMK58mh7o5sr73zSIeShJhD3R3ZXnvnkfAlKf/rY5jBkKbj7ajmH95NWlrOaBenAAAAAElFTkSuQmCC' />
-        )}
-
-        <span>{message?.payload}</span>
-      </You>
-    );
+const MessageContiainer = styled.div`
+margin: 10px;
+  padding: 0px 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: ${(props) => (props.outGoing ? "row-reverse" : "row")};
+  align-items: flex-end;
+  position: relative;
+  @media only screen and (max-width: 400px){
+    padding: 0px;
   }
+`;
+const Message = styled.div`
+max-width: 80%;
+  color: ${(props) =>
+    props.outGoing ? "white" : "#52616b"};;
+  background-color: ${(props) =>
+    props.outGoing ? "#3fc380" : "#c9d6df"};
+  padding: 15px 20px;
+  overflow: hidden;
+  border-radius: 10px;
+  font-size: 15px;
+  margin: 0px 10px;
+  position: relative;
+  &:after {border-width:15px 10px; left:50%; margin-left:-10px;
+    border-color:transparent transparent #3fc380 transparent; top:-25px;
+}
+`;
+const SeeMessage = ({ message }) => {
+  return (
+    <MessageContiainer outGoing={ message?.user?.isMe } key={ message.id }>
+      {message?.user?.isMe ? null : <Avatar url={ message?.user?.avatar } /> }
+      <Message outGoing={ message?.user?.isMe }>{ message?.payload }</Message>
+    </MessageContiainer>
+  )
+  // if (message?.user?.isMe) {
+  //   return (
+  //     <Me key={ message.id }>
+  //       <span></span>
+  //     </Me>
+  //   );
+  // } else {
+
+  //   return (
+  //     <You>
+  //       {message?.user?.avatar ? (
+  //         <YouAvatar url={ message?.user?.avatar } />
+  //       ) :
+  //         null }
+
+  //       <span>{ message?.payload }</span>
+  //     </You>
+  //   );
+  // }
 };
 
 export default SeeMessage;
