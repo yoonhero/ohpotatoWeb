@@ -1,8 +1,8 @@
 import Avatar from "./Avatar";
 import { gql, useMutation } from "@apollo/client";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane, faSearch } from "@fortawesome/free-solid-svg-icons";
 
 const READ_MESSAGE_MUTATION = gql`
   mutation readMessage($id: Int!) {
@@ -13,110 +13,6 @@ const READ_MESSAGE_MUTATION = gql`
   }
 `;
 
-const ConversationStart = styled.div`
-  position: relative;
-  width: 100%;
-  margin-bottom: 27px;
-  text-align: center;
-  span {
-    font-size: 14px;
-    display: inline-block;
-    &:before,
-    &:after {
-      position: absolute;
-      top: 10px;
-      display: inline-block;
-      width: 30%;
-      height: 1px;
-      content: "";
-    }
-    &:before {
-      left: 0;
-    }
-    &:after {
-      right: 0;
-    }
-  }
-`;
-
-const Bubble = styled.div`
-  min-width: 20%;
-  max-width: 60%;
-  margin-top: 1rem;
-  font-size: 16px;
-  position: relative;
-  display: inline-block;
-  clear: both;
-  margin-bottom: 8px;
-  padding: 20px 34px;
-  vertical-align: top;
-  border-radius: 15px;
-  align-items: center;
-  &:before {
-    position: absolute;
-    top: 19px;
-    display: block;
-    width: 8px;
-    height: 6px;
-    transform: rotate(29deg) skew(-35deg);
-  }
-`;
-
-const YouAvatar = styled(Avatar)``;
-const You = styled(Bubble)`
-  display: flex;
-  flex-direction: row;
-  float: left;
-  color: #6c7a89;
-  background-color: #e8f1f7;
-  align-self: flex-start;
-  span {
-    margin-left: 1rem;
-    max-width: 80%;
-  }
-  &:after {
-    border-top: 0px solid transparent;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #e8f1f7;
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: 30px;
-  }
-  &:before {
-    left: -3px;
-    background-color: blue;
-  }
-`;
-
-const Me = styled(Bubble)`
-  float: right;
-  color: #ffffff;
-  background-color: #73a2e2;
-  align-self: flex-end;
-  &:after {
-    border-top: 0px solid transparent;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #73a2e2;
-    content: "";
-    position: absolute;
-    top: -10px;
-    right: 30px;
-  }
-  &:before {
-    right: -3px;
-    background-color: #eceff1;
-  }
-  div {
-    position: absolute;
-    left: -5px;
-
-    top: -5px;
-    color: #67809f;
-  }
-`;
 const MessageContiainer = styled.div`
 margin: 10px;
   padding: 0px 10px;
@@ -125,31 +21,260 @@ margin: 10px;
   flex-direction: ${(props) => (props.outGoing ? "row-reverse" : "row")};
   align-items: flex-end;
   position: relative;
+  
+
+
   @media only screen and (max-width: 400px){
     padding: 0px;
   }
+
 `;
+
 const Message = styled.div`
-max-width: 80%;
+  display: flex;
+  border-radius: 10px 15px;
+max-width: 90%;
+min-width: 16%;
   color: ${(props) =>
     props.outGoing ? "white" : "#52616b"};;
   background-color: ${(props) =>
     props.outGoing ? "#3fc380" : "#c9d6df"};
   padding: 15px 20px;
   overflow: hidden;
-  border-radius: 10px;
-  font-size: 15px;
+  /* border-radius: 10px 20px 0 0; */
+  font-size: 16px;
   margin: 0px 10px;
-  position: relative;
-  &:after {border-width:15px 10px; left:50%; margin-left:-10px;
-    border-color:transparent transparent #3fc380 transparent; top:-25px;
-}
+`
+
+const Happiness = styled.div`
+  display: flex;
+max-width: 90%;
+min-width: 16%;
+  color: ${(props) =>
+    props.outGoing ? "white" : "#52616b"};;
+  background-color: ${(props) =>
+    props.outGoing ? "#3fc380" : "#c9d6df"};
+  padding: 20px 30px;
+  color: white;
+  overflow: visible;
+  border-radius: 20px;
+  /* border-radius: 10px 20px 0 0; */
+  font-size: 16px;
+  margin: 0px 10px;
+  /* background-color:#c5eff7; */
+  /* border-radius: 40% 30% 70% 10%; */
+  background-color: inherit;
+  background-image: url(http://localhost:3000/happy.svg);
+  background-repeat: none;
+  background-size: 120% ;
+  background-position: center;
+`
+
+const HappyMessage = styled.div`
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+max-width: 90%;
+min-width: 16%;
+  color: ${(props) =>
+    props.outGoing ? "white" : "#52616b"};;
+  background-color: ${(props) =>
+    props.outGoing ? "#3fc380" : "#c9d6df"};
+  padding: 15px 20px;
+  overflow: hidden;
+  /* border-radius: 10px 20px 0 0; */
+  font-size: 16px;
+  margin: 0px 10px;
+  border-radius: 50% / 10px 10px 100% 100%;
+  background:#e74c3c;
+
+  font-weight: 400;
+  
+  p{
+    max-width: 80%;
+  }
+  
+  /* &::after{
+    position:absolute;
+    content:"";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: black;
+    top: -10px;
+    
+  }
+  &::before{
+    position:absolute;
+    content:"";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: black;
+    top: -10px;
+    right: 70px;
+  } */
 `;
+
+const dropping = keyframes`
+  0% {
+		transform: translate(0px,0px) rotate(-90deg);
+    
+	}
+
+	60% {
+		transform: translate(0px,15px) rotate(-80deg);
+	}
+
+	100% {
+		transform: translate(0px,5px) rotate(-95deg);
+	}
+`
+
+const SadMessage = styled.div`
+  position:relative;
+  display: flex;
+  max-width: 90%;
+  min-width: 16%;
+  color: ${(props) =>
+    props.outGoing ? "white" : "#52616b"};;
+  background-color: ${(props) =>
+    props.outGoing ? "#3fc380" : "#c9d6df"};
+  padding: 15px 20px;
+  color: white;
+  overflow: visible;
+  border-radius: 15px 10px;
+  /* border-radius: 10px 20px 0 0; */
+  font-size: 16px;
+  margin: 0px 10px;
+  /* background-color:#c5eff7; */
+  /* border-radius: 40% 30% 70% 10%; */
+  background-color: #3A93E4;
+  /*background-image:url("http://localhost:3000/sad2.svg");
+  background-repeat: none;
+  background-size: cover ;
+  background-position: center; */
+  
+  svg{
+    position:absolute;
+    width: 20px;
+    
+    top: 30px;
+    animation: ${dropping} 2s ease infinite;
+    
+  }
+
+`
+
+const FireTextColorChange = keyframes`
+  0%{
+    color: #FCFE09;
+  }
+  50% {
+    color: #FFC629;
+  }
+  60%{
+    color: #AA1404;
+  }
+  100%{
+    color: #FFC629;
+  }
+`
+
+const AngryMessage = styled.div`
+position:relative;
+display: flex;
+  max-width: 90%;
+  min-width: 16%;
+  color: ${(props) =>
+    props.outGoing ? "white" : "#52616b"};;
+  background-color: ${(props) =>
+    props.outGoing ? "#3fc380" : "#c9d6df"};
+  padding: 15px 20px;
+  color: black;
+  overflow: visible;
+  border-radius: 15px 10px;
+  /* border-radius: 10px 20px 0 0; */
+  font-size: 16px;
+  margin: 0px 10px;
+  /* background-color:#c5eff7; */
+  /* border-radius: 40% 30% 70% 10%; */
+  background-color: #0e0e0e;
+  /*background-image:url("http://localhost:3000/sad2.svg");
+  background-repeat: none;
+  background-size: cover ;
+  background-position: center; */
+  
+  p{
+    color: #ffeb3b;
+    font-weight: 400;
+    font-size: 18px;
+    animation: ${FireTextColorChange} 4s infinite;
+    text-shadow: 0 0 10px #ff8c3b;
+    
+  }
+`
+
+const CuriousMoving = keyframes`
+  0% {
+		transform: translate(0px,0px);
+    
+	}
+
+	60% {
+		transform: translate(0px,-15px) ;
+	}
+
+	100% {
+		transform: translate(-15px,-5px);
+	}
+`
+
+const CuriousMessage = styled.div`
+  position: relative;
+  border-radius: 10px 15px;
+max-width: 90%;
+min-width: 16%;
+  color: ${(props) =>
+    props.outGoing ? "white" : "#52616b"};;
+  background-color: ${(props) =>
+    props.outGoing ? "#3fc380" : "#c9d6df"};
+  padding: 15px 20px;
+  /* border-radius: 10px 20px 0 0; */
+  font-size: 16px;
+  margin: 0px 10px;
+
+  p{
+    z-index: 5;
+  }
+  svg{
+    position: absolute;
+    animation: ${CuriousMoving} 2s infinite;
+    right: 10px;
+  }
+`
+
+
+
+
 const SeeMessage = ({ message }) => {
   return (
     <MessageContiainer outGoing={ message?.user?.isMe } key={ message.id }>
+
       {message?.user?.isMe ? null : <Avatar url={ message?.user?.avatar } /> }
-      <Message outGoing={ message?.user?.isMe }>{ message?.payload }</Message>
+      <Message outGoing={ message?.user?.isMe }>
+        <p>{ message?.payload }</p>
+        {/* sad message <svg width="10px" height="20px" viewBox="0 0 482 297" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <ellipse rx="106.76" ry="143.996" transform="matrix(0.0193094 0.999814 -0.999933 0.0115742 182.388 146.414)" fill="#3A93E4" />
+          <path d="M417.394 122.611C437.234 130.604 437.799 158.471 418.292 166.898L268.946 231.416C253.271 238.188 235.602 226.768 235.255 209.639L232.706 83.9246C232.359 66.796 249.557 54.9911 265.5 61.4144L417.394 122.611Z" fill="#3A93E4" />
+        </svg> */}
+        {/* curious message <FontAwesomeIcon icon={ faSearch } size="2x" /> */ }
+
+
+      </Message>
+
     </MessageContiainer>
   )
   // if (message?.user?.isMe) {

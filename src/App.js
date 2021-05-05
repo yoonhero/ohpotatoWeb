@@ -13,6 +13,7 @@ import Layout from "./components/Layout";
 import EditProfile from "./screens/EditProfile";
 import SearchUsers from "./screens/SearchUsers";
 import Room from "./screens/Room";
+import CreateRoom from "./screens/CreateRoom";
 
 function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
@@ -52,6 +53,9 @@ function App() {
               </Route>
               <Route path={ `/room/:id/` }>
                 <Room />
+              </Route>
+              <Route path={ `/createRoom/` }>
+                <CreateRoom />
               </Route>
               <Route>
                 <Layout>

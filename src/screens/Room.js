@@ -1,7 +1,7 @@
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 import { useParams } from "react-router";
 import { LoadingSpinner } from "../components/LoadingSpinner";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { RoomHeader } from "../components/RoomHeader"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
@@ -70,7 +70,70 @@ const Content = styled.main`
   width: 100%;
 `;
 
+const wavemove = keyframes`
+  0% {
+    margin-left: 0;
+  }
+  100% {
+    margin-left: -1600px;
+  }
+`
+const swell = keyframes`
+    0%, 100% {
+    transform: translate3d(0,-25px,0);
+  }
+  50% {
+    transform: translate3d(0,5px,0);
+  }
+`
+const WaveWrapper = styled.div`
+  /* position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 40vh;
+  border-radius: 5px;
+   background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%); 
+  overflow: hidden; */
+  height: 10%;
+  width:100%;
+  position:fixed;
+  bottom:0;
+  left:0;
+  background: #015871;
+  
+`
+const Wave = styled.div`
+      /* width: 70vw;
+  height: 70vh;
+  position: absolute;
+  left: 50%;
+ background: #03a9f4;
+  z-index:0;
+  margin-left: -10vw;
+  margin-top: -60vh;
+  border-radius: 45%;
+  background: #f5f5f5;
+  animation: ${wavemove} 15s infinite linear; */
+  background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/85486/wave.svg) repeat-x; 
+  position: absolute;
+  top: -198px;
+  width: 6400px;
+  height: 198px;
+  animation: ${wavemove} 7s cubic-bezier( 0.36, 0.45, 0.63, 0.53) infinite;
+  transform: translate3d(0, 0, 0);
+  &:nth-of-type(2){
+    top: -175px;
+  animation: ${wavemove} 7s cubic-bezier( 0.36, 0.45, 0.63, 0.53) -.125s infinite, ${swell} 7s ease -1.25s infinite;
+  opacity: 1;
+  }
+
+`
+const Wava = styled.div`
+`
+
 const Chat = styled.div`
+z-index: 1;
   position: relative;
   width: 100%;
   overflow: hidden;
@@ -78,15 +141,17 @@ const Chat = styled.div`
   border: none;
   justify-content: flex-end;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-y: auto; 
+
   @media only screen and (max-width: 400px){
     padding: 5px;
     padding-bottom: 90px;
   }
+
 `;
 
 const InputContainer = styled.form`
-
+  z-index: 2;
   background-color: #f5f5f5;
   margin: 0;
   justify-content: center;
@@ -124,11 +189,57 @@ const Input = styled.input`
   padding: 12px;
 `;
 
+const rays = keyframes`
+  0% {
+      transform: scale(1.1);
+  }
+  25% {
+      transform: scale(0.9);
+  }
+  50% {
+      transform: scale(1.1);
+  }
+  75% {
+      transform: scale(0.9);
+  }
+  100% {
+      transform: scale(1.1);
+  }
+`
+
+
+const SunRays = styled.span`
+  position: fixed;
+  bottom: 32em;
+  right: 18em;
+  height: 15em;
+  width: 15em;
+  z-index: -5;
+  background: radial-gradient(rgba(255, 237, 175, .8) 50%, rgba(255, 237, 175, .2) 70%);
+  border-radius: 50%;
+  box-shadow: 0 0 .5em rgba(255, 237, 175, 1);
+  -webkit-animation: ${rays} 10s infinite;
+  -moz-animation: ${rays} 10s infinite;
+  animation: ${rays} 10s infinite;
+  `
+const Sun = styled.span`
+  position: fixed;
+  bottom: 34.5em;
+  right: 20.5em;
+  height: 10em;
+  width: 10em;
+  z-index: -5;
+  background: rgba(255, 237, 175, 1);
+  border-radius: 50%;
+  box-shadow: 0 0 1em rgba(255, 237, 175, .5), inset 0 0 .5em #FFFFAD;
+`
+
 const Room = () => {
   const scrollRef = useRef(null);
   const { id } = useParams();
   const [avatar, setAvatar] = useState("")
   const [talkingto, setTalkingto] = useState("")
+  const [emotion, setEmotion] = useState(0)
   const { register, handleSubmit, getValues, setValue } = useForm({
     mode: "onChange",
   });
@@ -141,18 +252,19 @@ const Room = () => {
   );
   useEffect(() => {
     animateScroll.scrollToBottom()
+    setEmotion(localStorage.getItem("EMOTION"))
   }, [])
   useEffect(() => {
     if (data !== undefined) {
 
       getAvatar(data?.seeRoom?.users)
-      subscribeToMore({
-        document: ROOM_UPDATE,
-        variables: {
-          id: Math.floor(id),
-        },
-        updateQuery,
-      });
+      // subscribeToMore({
+      //   document: ROOM_UPDATE,
+      //   variables: {
+      //     id: Math.floor(id),
+      //   },
+      //   updateQuery,
+      // });
     }
   }, [data])
 
@@ -271,6 +383,12 @@ const Room = () => {
     <>
       <RoomHeader username={ talkingto } url={ avatar } />
       <Content>
+        { emotion < 25 ? <><SunRays></SunRays>
+          <Sun></Sun></> : emotion < 50 ? <WaveWrapper>
+            <Wave></Wave>
+            <Wave></Wave>
+          </WaveWrapper> : emotion < 75 ? null : null }
+
         { loading ? (
           <LoadingSpinner />
         ) : (
@@ -280,6 +398,8 @@ const Room = () => {
                 <SeeMessage message={ message } />
               )) }
             </Chat>
+
+
             <InputContainer onSubmit={ handleSubmit(onSubmitValid) }>
               <Input
                 ref={ register({

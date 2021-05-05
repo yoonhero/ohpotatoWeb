@@ -88,7 +88,7 @@ export const RoomHeader = ({ url, username }) => {
           </Link>
         </Column>
         <Column>
-          <Avatar url />
+          <Avatar url={ url } />
           <p>{ username }</p>
         </Column>
         <Column>

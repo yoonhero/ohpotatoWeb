@@ -1,5 +1,5 @@
 import { gql, useQuery, useApolloClient } from "@apollo/client";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import PageTitle from "../components/PageTitle";
 import useUser from "../hooks/useUser";
@@ -8,6 +8,24 @@ import Button from "../components/auth/Button";
 import { BaseBox, FatText } from "../components/shared";
 import React, { useState, useEffect } from "react";
 import Avatar from "../components/Avatar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCommentDots, faPlus, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import Modal from 'react-modal';
+import { CircleSlider } from "react-circle-slider"
+
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    border: "none",
+    borderRadius: "20px"
+  }
+}
 
 export const SEE_ROOMS = gql`
   query seeRooms {
@@ -19,6 +37,19 @@ export const SEE_ROOMS = gql`
         username
         avatar
         isMe
+      }
+    }
+  }
+`;
+
+const SEE_USERS = gql`
+  query seeFriends($username: String!) {
+    seeFriends(username: $username, page:1) {
+      ok
+      followers {
+        username
+        avatar
+        id
       }
     }
   }
@@ -121,6 +152,15 @@ const ProfileBtn = styled(Button).attrs({
   cursor: pointer;
 `;
 
+const Actions = styled.div`
+  position: absolute;
+  right: 10px;
+  top: 10px;
+`
+
+const Action = styled.div`
+
+`
 
 const Grid = styled.div`
 position:relative;
@@ -133,11 +173,11 @@ position:relative;
   margin-top: 50px;
   @media only screen and (max-width: 700px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0px;
+    gap: 50px;
   }
   @media only screen and (max-width: 500px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0px;
+    gap: 40px;
   }
   border-radius: 10px;
 
@@ -184,12 +224,87 @@ const Icon = styled.div`
   }
 `;
 
+
+const UsersContainer = styled.div`
+display:flex;
+  padding: 20px;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+const UserContainer = styled.div`
+display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  
+`;
+
+const Users = styled.div`
+  min-width: 60vw;
+  max-width: 80vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  p{
+    font-size: 16px;
+    font-weight: 400;
+    margin-left: 20px;
+  }
+`
+
+const PlusRoomBtn = styled.button`
+  border: none;
+  background: inherit;
+  svg{
+    font-size: 20px;
+    color: #000;
+  }
+`
+
+const ControlEmotion = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right:0;
+  top: 0;
+  svg{
+    position:absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    z-index: 20;
+  }
+  img{
+    position:absolute;
+    top: 10px;
+    right: 10px;
+    width: 80px;
+
+  }
+`
+
 const Home = () => {
   const client = useApolloClient();
   const { data, loading } = useQuery(SEE_ROOMS);
   const { data: userData } = useUser();
   const [username, setUsername] = useState("");
   const [profileData, setProfileData] = useState([]);
+  const history = useHistory()
+  const [value, setValue] = useState(0)
+  const [emotion, setEmotion] = useState("./happ.png")
+  const { data: uesrsData, refetch } = useQuery(SEE_USERS, {
+    variables: {
+      username,
+    },
+  });
+
+  const [refreshing, setRefreshing] = useState(false);
+  useEffect(() => {
+    setValue(localStorage.getItem("EMOTION"))
+  }, [])
   useEffect(() => {
 
     if (userData !== undefined) {
@@ -199,24 +314,91 @@ const Home = () => {
   }, [userData])
   useEffect(() => {
     if (username !== "") {
-      const profile = client.query({
+      client.query({
         query: SEE_PROFILE_QUERY, variables: {
           username
         }
       }).then((a) => setProfileData(a.data));
     }
   }, [username])
+  useEffect(() => {
+    localStorage.setItem("EMOTION", value)
+    if (value < 25) {
+      setEmotion("./happ.png")
+
+    } else if (value < 50) {
+      setEmotion("./sadd.png")
+    } else if (value < 75) {
+      setEmotion("./dilike.png")
+    } else {
+      setEmotion("./angy.png")
+    }
+  }, [value])
+  const [modalIsOpen, setIsOpen] = React.useState(false);
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
   // const { data: profileData } = useQuery(SEE_PROFILE_QUERY, {
   //   variables: {
   //     username,
   //   },
   // });
 
+  const refresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+  const createRoom = (user) => {
+    if (data === undefined) {
+      return;
+    }
+    const { username: userName } = user;
+    let existing = [];
+    let existingRoom = [];
+    data?.seeRooms.find((room) => {
+      room.users.find((user) => {
+        if (user.username === userName) {
+          existing = user;
+        }
+      });
+      if (existing.length !== 0) {
+        existingRoom = room;
+      }
+      existing = []
+    });
+    if (existingRoom.length !== 0) {
+      history.push(`/room/${existingRoom.id}`)
+      // navigation.navigate("Room", {
+      //   id: existingRoom.id,
+      //   talkingTo: existing,
+      // });
+    } else {
+      history.push(`/createRoom/`, {
+        talkingto: user,
+      })
+      // navigation.navigate("FirstMessage", {
+      //   user: user,
+      // });
+    }
+  };
+  const handleEmotionChange = (value) => {
+    setValue(value)
+  }
   return (
     <Main>
       <Header>
         { profileData?.seeProfile ? (
           <>
+            <ControlEmotion>
+              <CircleSlider value={ value } onChange={ handleEmotionChange } circleColor="#fff" progressColor="#c2e9fb" knobColor=" #a1c4fd" />
+              <img src={ emotion } />
+            </ControlEmotion>
+
             <Column>
               <Row>
                 <Avatar url={ profileData?.seeProfile?.avatar } lg />
@@ -235,6 +417,7 @@ const Home = () => {
 
               <Row>
                 <Username>{ profileData?.seeProfile?.username }</Username>
+
                 {/* { data?.seeProfile ? getButton(data.seeProfile) : null } */ }
               </Row>
               {/* <Row>
@@ -267,13 +450,43 @@ const Home = () => {
         ) }
       </Header>
       <Grid>
+        <Actions>
+          <Action onClick={ openModal }>
+            <FontAwesomeIcon icon={ faCommentDots } size="large" />
+          </Action>
+          <Modal
+            isOpen={ modalIsOpen }
+            onRequestClose={ closeModal }
+            style={ customStyles }
+            contentLabel="Plus Room"
+          >
+
+            <Users>
+              { uesrsData?.seeFriends?.followers?.map(user => {
+                return (
+                  <UsersContainer>
+                    <UserContainer onClick={ () => createRoom(user) }>
+                      <Avatar url={ user.avatar } />
+                      <p>{ user.username }</p>
+                    </UserContainer>
+                    <PlusRoomBtn onClick={ () => createRoom(user) }>
+                      <FontAwesomeIcon icon={ faPlus } size={ 24 } color='white' />
+                    </PlusRoomBtn>
+                  </UsersContainer>
+                )
+              }) }
+
+            </Users>
+
+          </Modal>
+
+        </Actions>
         { loading ? (
           <LoadingSpinner />
         ) : (
           data?.seeRooms?.map((room) => {
             return room?.users?.map((user) => {
               if (!user.isMe) {
-                console.log(user.avatar)
                 return (
                   <Link to={ `/room/${room?.id}` }>
                     <RoomBtn key={ user?.id } bg={ user.avatar !== null ? user.avatar : "https://www.kindpng.com/picc/m/22-223863_no-avatar-png-circle-transparent-png.png" } >
