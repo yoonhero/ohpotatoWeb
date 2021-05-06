@@ -233,6 +233,80 @@ const Sun = styled.span`
   border-radius: 50%;
   box-shadow: 0 0 1em rgba(255, 237, 175, .5), inset 0 0 .5em #FFFFAD;
 `
+const vibrate = keyframes`
+	to {
+		transform: scale(0.75) translate(15px, 15px) rotate(45deg);
+	}
+
+
+`
+
+const FireContainer = styled.div`
+position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const Fire = styled.div`
+  position: relative;
+`
+
+const Diamond = styled.div`
+
+  transform: rotate(45deg);
+  width: 140px;
+height: 140px;
+  border-radius: 20px;
+  animation: ${vibrate} 0.85s ease-in
+		0.25s alternate-reverse infinite;
+  background-color:#bf033b;
+	background-image: linear-gradient(
+		195deg,
+	#bf033b 0%,
+#ffc719 74%
+	);
+`
+
+const DiamondRight = styled.div`
+  position:absolute;
+  top: 10px;
+  right: -20px;
+  transform: rotate(45deg);
+  width: 70px;
+height: 70px;
+border-radius: 15px;
+  animation: ${vibrate} 0.85s ease-in
+		0.25s alternate-reverse infinite;
+  background-color:#bf033b;
+	background-image: linear-gradient(
+		195deg,
+	#bf033b 0%,
+#ffc719 74%
+	);
+`
+
+const DiamondLeft = styled.div`
+  position:absolute;
+  top: 10px;
+  left: -20px;
+  transform: rotate(45deg);
+width: 70px;
+height: 70px;
+  border-radius: 15px;
+  animation: ${vibrate} 0.85s ease-in
+		0.25s alternate-reverse infinite;
+  background-color:#bf033b;
+	background-image: linear-gradient(
+		195deg,
+	#bf033b 0%,
+#ffc719 74%
+	);
+`
 
 const Room = () => {
   const scrollRef = useRef(null);
@@ -387,7 +461,14 @@ const Room = () => {
           <Sun></Sun></> : emotion < 50 ? <WaveWrapper>
             <Wave></Wave>
             <Wave></Wave>
-          </WaveWrapper> : emotion < 75 ? null : null }
+          </WaveWrapper> : emotion < 75 ? null : <FireContainer>
+            <Fire>
+              <DiamondLeft></DiamondLeft>
+              <Diamond></Diamond>
+              <DiamondRight></DiamondRight>
+            </Fire>
+          </FireContainer> }
+
 
         { loading ? (
           <LoadingSpinner />
