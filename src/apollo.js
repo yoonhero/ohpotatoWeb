@@ -47,11 +47,15 @@ export const disabledDarkMode = () => {
 
 
 const uploadHttpLink = createUploadLink({
-  uri: "http://localhost:7000/graphql",
+  uri: process.env.NODE_ENV === "production"
+    ? "https://accordingtochat.herokuapp.com/graphql"
+    : "http://localhost:7000/graphql",
 });
 
 const wsLink = new WebSocketLink({
-  uri: "ws://localhost:7000/graphql",
+  uri: process.env.NODE_ENV === "production"
+    ? "ws://accordingtochat.herokuapp.com/graphql"
+    : "ws://localhost:7000/graphql",
   options: {
     reconnect: true,
     connectionParams: () => ({
@@ -61,7 +65,9 @@ const wsLink = new WebSocketLink({
 });
 
 const httpLink = createUploadLink({
-  uri: "http://localhost:7000/graphql",
+  uri: process.env.NODE_ENV === "production"
+    ? "https://accordingtochat.herokuapp.com/graphql"
+    : "http://localhost:7000/graphql",
 });
 
 const authLink = setContext((_, { headers }) => {
