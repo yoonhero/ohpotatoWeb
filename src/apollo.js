@@ -54,8 +54,8 @@ const uploadHttpLink = createUploadLink({
 
 const wsLink = new WebSocketLink({
   uri: process.env.NODE_ENV === "production"
-    ? "ws://accordingtochat.herokuapp.com/graphql"
-    : "ws://localhost:7000/graphql",
+    ? "wss://accordingtochat.herokuapp.com/graphql"
+    : "wss://localhost:7000/graphql",
   options: {
     reconnect: true,
     connectionParams: () => ({
