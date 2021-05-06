@@ -57,7 +57,9 @@ const wsLink = new WebSocketLink({
     ? "wss://accordingtochat.herokuapp.com/graphql"
     : "wss://localhost:7000/graphql",
   options: {
+
     reconnect: true,
+    timeout: 30000,
     connectionParams: () => ({
       token: localStorage.getItem(TOKEN),
     }),
